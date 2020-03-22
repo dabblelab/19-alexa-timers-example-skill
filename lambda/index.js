@@ -1,61 +1,62 @@
 const Alexa = require('ask-sdk-core');
 const axios = require('axios');
+const moment = require("moment");
 
 const timerItem = {
-  "duration": "PT10S",
-  "timerLabel": "dabble",
-  "creationBehavior": {
-     "displayExperience": {
-         "visibility": "VISIBLE"
-    }
- },
-  "triggeringBehavior": {
-    "operation": {
-      "type": "ANNOUNCE",
-      "textToAnnounce": [
-        {
-          "locale": "en-US",
-          "text": "This ends your timer."
+    "duration": "PT15S",
+    "timerLabel": "demo",
+    "creationBehavior": {
+        "displayExperience": {
+            "visibility": "VISIBLE"
         }
-      ]
     },
-    "notificationConfig": {
-      "playAudible": true
+    "triggeringBehavior": {
+        "operation": {
+            "type": "ANNOUNCE",
+            "textToAnnounce": [
+                {
+                    "locale": "en-US",
+                    "text": "This ends your timer."
+                }
+            ]
+        },
+        "notificationConfig": {
+            "playAudible": true
+        }
     }
-  }
 };
 
 const LaunchRequestHandler = {
     canHandle(handlerInput) {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'LaunchRequest'
-                || (Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
-                && (Alexa.getIntentName(handlerInput.requestEnvelope) === 'TimerStartIntent' ));
+            || (Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
+                && (Alexa.getIntentName(handlerInput.requestEnvelope) === 'TimerStartIntent'));
     },
     handle(handlerInput) {
-        
+
         const { permissions } = handlerInput.requestEnvelope.context.System.user;
-        
+
         if (!permissions) {
-            
+
             handlerInput.responseBuilder
-            .speak("This skill needs permission to access your timers.")
-        	.addDirective({
-        		type: "Connections.SendRequest",
-        		name: "AskFor",
-        		payload: {
-        			"@type": "AskForPermissionsConsentRequest",
-        			"@version": "1",
-        			"permissionScope": "alexa::alerts:timers:skill:readwrite"
-        		},
-        		token: ""
-        	});
-            
+                .speak("This skill needs permission to access your timers.")
+                .addDirective({
+                    type: "Connections.SendRequest",
+                    name: "AskFor",
+                    payload: {
+                        "@type": "AskForPermissionsConsentRequest",
+                        "@version": "1",
+                        "permissionScope": "alexa::alerts:timers:skill:readwrite"
+                    },
+                    token: ""
+                });
+
         } else {
             handlerInput.responseBuilder
                 .speak("would you like to set a timer?")
                 .reprompt("would you like to set a timer?")
         }
-	
+
         return handlerInput.responseBuilder
             .getResponse();
 
@@ -69,43 +70,47 @@ const ConnectionsResponsetHandler = {
     handle(handlerInput) {
         const { permissions } = handlerInput.requestEnvelope.context.System.user;
 
+        //console.log(JSON.stringify(handlerInput.requestEnvelope));
+        //console.log(handlerInput.requestEnvelope.request.payload.status);
+
         const status = handlerInput.requestEnvelope.request.payload.status;
-          
+
+
         if (!permissions) {
             return handlerInput.responseBuilder
                 .speak("I didn't hear your answer. This skill requires your permission.")
                 .addDirective({
-            		type: "Connections.SendRequest",
-            		name: "AskFor",
-            		payload: {
-            			"@type": "AskForPermissionsConsentRequest",
-            			"@version": "1",
-            			"permissionScope": "alexa::alerts:timers:skill:readwrite"
-            		},
-            		token: ""
-            	})
-            	.getResponse();
+                    type: "Connections.SendRequest",
+                    name: "AskFor",
+                    payload: {
+                        "@type": "AskForPermissionsConsentRequest",
+                        "@version": "1",
+                        "permissionScope": "alexa::alerts:timers:skill:readwrite"
+                    },
+                    token: "user-id-could-go-here"
+                })
+                .getResponse();
         }
-        
-        switch(status) {
-            case "ACCEPTED" :
+
+        switch (status) {
+            case "ACCEPTED":
                 handlerInput.responseBuilder
                     .speak("Now that we have permission to set a timer. Would you like to start?")
                     .reprompt('would you like to start?')
                 break;
-            case "DENIED" :
+            case "DENIED":
                 handlerInput.responseBuilder
                     .speak("Without permissions, I can't set a timer. So I guess that's goodbye.");
                 break;
-            case "NOT_ANSWERED" :
+            case "NOT_ANSWERED":
 
-                break;  
+                break;
             default:
-              handlerInput.responseBuilder
+                handlerInput.responseBuilder
                     .speak("Now that we have permission to set a timer. Would you like to start?")
                     .reprompt('would you like to start?');
         }
-        
+
         return handlerInput.responseBuilder
             .getResponse();
     }
@@ -114,41 +119,43 @@ const ConnectionsResponsetHandler = {
 const YesNoIntentHandler = {
     canHandle(handlerInput) {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
-            && (Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.YesIntent' 
-            || Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.NoIntent');
+            && (Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.YesIntent'
+                || Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.NoIntent');
     },
     async handle(handlerInput) {
-        let speakOutput = 'You said yes or no';
-        
+
+        //handle 'yes' utterance
         if (Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.YesIntent') {
-            //user wants to start a timer.
-            speakOutput = 'Alright a 25 minute timer has been started.';
-                    const options = {
-          headers: {
-          	    "Authorization": `Bearer ${Alexa.getApiAccessToken(handlerInput.requestEnvelope)}`,
-        		"Content-Type": "application/json"
-          }
-        };
-        
-        await axios.post('https://api.amazonalexa.com/v1/alerts/timers', timerItem, options)
-          .then(response => {
-            //console.log(response.data.url);
-            speakOutput = `Your ${timerItem.timerLabel} timer is ${response.data.status}.`;
-            //speakOutput = accessToken ? "got it" :  "no dice";
-          })
-          .catch(error => {
-            console.log(error);
-          });
+
+            const duration = moment.duration(timerItem.duration),
+                hours = (duration.hours() > 0) ? `${duration.hours()} ${(duration.hours() == 1) ? "hour" : "hours"},` : "",
+                minutes = (duration.minutes() > 0) ? `${duration.minutes()} ${(duration.minutes() == 1) ? "minute" : "minutes"} ` : "",
+                seconds = (duration.seconds() > 0) ? `${duration.seconds()} ${(duration.seconds() == 1) ? "second" : "seconds"}` : "";
+
+            const options = {
+                headers: {
+                    "Authorization": `Bearer ${Alexa.getApiAccessToken(handlerInput.requestEnvelope)}`,
+                    "Content-Type": "application/json"
+                }
+            };
+
+            await axios.post('https://api.amazonalexa.com/v1/alerts/timers', timerItem, options)
+                .then(response => {
+                    handlerInput.responseBuilder
+                        .speak(`Your ${timerItem.timerLabel} timer is set for ${hours} ${minutes} ${seconds}.`);
+                })
+                .catch(error => {
+                    console.log(error);
+                });
         }
 
+        //handle 'no' utterance
         if (Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.NoIntent') {
-            //user wants to start a timer.
-            speakOutput = 'Alright I didn\'t start a timer.';
+            handlerInput.responseBuilder
+                .speak('Alright I didn\'t start a timer.');
         }
-        
+
         return handlerInput.responseBuilder
-            .speak(speakOutput)
-            //.reprompt(speakOutput)
             .getResponse();
     }
 };
@@ -159,7 +166,7 @@ const HelpIntentHandler = {
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.HelpIntent';
     },
     handle(handlerInput) {
-        const speakOutput = 'You can say hello to me! How can I help?';
+        const speakOutput = 'You can say set a timer.';
 
         return handlerInput.responseBuilder
             .speak(speakOutput)
@@ -236,5 +243,5 @@ exports.handler = Alexa.SkillBuilders.custom()
     .addErrorHandlers(
         ErrorHandler,
     )
-    .withApiClient(new Alexa.DefaultApiClient()) 
+    .withApiClient(new Alexa.DefaultApiClient())
     .lambda();
