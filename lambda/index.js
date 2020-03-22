@@ -128,9 +128,9 @@ const YesNoIntentHandler = {
         if (Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.YesIntent') {
 
             const duration = moment.duration(timerItem.duration),
-                hours = (duration.hours() > 0) ? `${duration.hours()} ${(duration.hours() == 1) ? "hour" : "hours"},` : "",
-                minutes = (duration.minutes() > 0) ? `${duration.minutes()} ${(duration.minutes() == 1) ? "minute" : "minutes"} ` : "",
-                seconds = (duration.seconds() > 0) ? `${duration.seconds()} ${(duration.seconds() == 1) ? "second" : "seconds"}` : "";
+                hours = (duration.hours() > 0) ? `${duration.hours()} ${(duration.hours() === 1) ? "hour" : "hours"},` : "",
+                minutes = (duration.minutes() > 0) ? `${duration.minutes()} ${(duration.minutes() === 1) ? "minute" : "minutes"} ` : "",
+                seconds = (duration.seconds() > 0) ? `${duration.seconds()} ${(duration.seconds() === 1) ? "second" : "seconds"}` : "";
 
             const options = {
                 headers: {
