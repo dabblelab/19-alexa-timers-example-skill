@@ -1,5 +1,7 @@
 # 19 - Alexa Timers Example Skill
 
+[![Video Tutorial](http://img.youtube.com/vi/csma1jIhgAE/maxresdefault.jpg)](http://www.youtube.com/watch?v=csma1jIhgAE)
+
 This is an example template that show how to use timers in a custom Alexa skill. It also includes code that shows how to implement support for voice permissions.
 
 ### Prerequisites 
