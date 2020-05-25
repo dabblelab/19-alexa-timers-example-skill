@@ -3,7 +3,7 @@
     "publishingInformation": {
       "locales": {
         "en-US": {
-          "summary": "alexa-timers-example-skill",
+          
           "examplePhrases": [
             "Alexa open hello world template",
             "Alexa tell hello world template I am Jeff",
@@ -14,7 +14,8 @@
             "keyword2",
             "keyword3"
           ],
-          "name": "entity-resolution-template",
+          "name": "alexa-timers-example-skill",
+          "summary": "Sample Summary",
           "description": "Sample Full Description",
           "smallIconUri": "https://s3.amazonaws.com/cdn.dabblelab.com/img/skill-template-default-sm.png",
           "largeIconUri": "https://s3.amazonaws.com/cdn.dabblelab.com/img/skill-template-default-lg.png"
