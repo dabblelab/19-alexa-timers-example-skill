@@ -1,7 +1,7 @@
 {
   "interactionModel": {
     "languageModel": {
-      "invocationName": "demo skill",
+      "invocationName": "timers example",
       "intents": [
         {
           "name": "TimerStartIntent",
