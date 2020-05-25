@@ -3,7 +3,7 @@
     "apis": {
       "custom": {
         "endpoint": {
-          "uri": "arn:aws:lambda:us-east-1:128848124248:function:7311c7e9-2f1f-4f51-bf42-81b581a4b4d9:Release_0"
+          "uri": ""
         },
         "interfaces": []
       }
@@ -17,7 +17,7 @@
     "publishingInformation": {
       "locales": {
         "en-US": {
-          "name": "demo skill",
+          "name": "alexa-timers-example-skill",
           "summary": "Sample Short Description",
           "description": "Sample Full Description",
           "examplePhrases": [
@@ -25,7 +25,9 @@
             "hello",
             "help"
           ],
-          "keywords": []
+          "keywords": [],
+          "smallIconUri": "https://s3.amazonaws.com/cdn.dabblelab.com/img/skill-template-default-sm.png",
+          "largeIconUri": "https://s3.amazonaws.com/cdn.dabblelab.com/img/skill-template-default-lg.png"
         }
       },
       "isAvailableWorldwide": true,
