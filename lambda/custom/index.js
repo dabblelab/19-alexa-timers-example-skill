@@ -139,7 +139,9 @@ const YesNoIntentHandler = {
                 }
             };
 
-            await axios.post('https://api.amazonalexa.com/v1/alerts/timers', timerItem, options)
+            const apiEndpoint = getApiEndpoint(Alexa.getLocale(handlerInput.requestEnvelope));
+
+            await axios.post(apiEndpoint, timerItem, options)
                 .then(response => {
                     handlerInput.responseBuilder
                         .speak(`Your ${timerItem.timerLabel} timer is set for ${hours} ${minutes} ${seconds}.`);
@@ -229,6 +231,66 @@ const ErrorHandler = {
             .getResponse();
     }
 };
+
+function getApiEndpoint(locale) {
+
+    //North America – https://api.amazonalexa.com
+    //Europe – https://api.eu.amazonalexa.com
+    //Far East – https://api.fe.amazonalexa.com
+
+    const naEndpoint = "https://api.amazonalexa.com/v1/alerts/timers",
+          euEndpoint = "https://api.eu.amazonalexa.com/v1/alerts/timers",
+          feEndpoint = "https://api.fe.amazonalexa.com/v1/alerts/timers";
+
+    let apiEndpoint = naEndpoint;
+
+    switch (locale) {
+        case "de-DE":
+            apiEndpoint = euEndpoint;
+            break;
+        case "en-AU":
+            apiEndpoint = feEndpoint;
+            break;
+        case "en-CA":
+            apiEndpoint = naEndpoint
+            break;
+        case "en-GB":
+            apiEndpoint = euEndpoint;
+            break;
+        case "en-IN":
+            apiEndpoint = feEndpoint;
+            break;
+        case "en-US":
+            apiEndpoint = naEndpoint;
+            break;
+        case "es-MX":
+            apiEndpoint = naEndpoint
+            break;
+        case "es-US":
+            apiEndpoint = naEndpoint;
+            break;
+        case "fr-CA":
+            apiEndpoint = naEndpoint;
+            break;
+        case "fr-FR":
+            apiEndpoint = euEndpoint;
+            break;
+        case "hi-IN":
+            apiEndpoint = feEndpoint;
+            break;
+        case "it-IT":
+            apiEndpoint = euEndpoint;
+            break;
+        case "ja-JP":
+            apiEndpoint = feEndpoint;
+            break;
+        case "pt-BR" :
+            apiEndpoint = naEndpoint;
+            break;
+    }
+
+    return apiEndpoint;
+}
 
 exports.handler = Alexa.SkillBuilders.custom()
     .addRequestHandlers(
