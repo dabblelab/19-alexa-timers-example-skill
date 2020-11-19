@@ -258,7 +258,7 @@ function getApiEndpoint(locale) {
             apiEndpoint = euEndpoint;
             break;
         case "en-IN":
-            apiEndpoint = feEndpoint;
+            apiEndpoint = euEndpoint;
             break;
         case "en-US":
             apiEndpoint = naEndpoint;
